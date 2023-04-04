@@ -78,6 +78,8 @@ async def delete_todo(todo_id: int, db: Session = Depends(get_db)):
     
     return successful_response()
 
+
+
 def http_exception():
     return HTTPException(status_code = 404,detail = "Todo not found")
 
