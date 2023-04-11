@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, status
 from pydantic import BaseModel
 from typing import Optional
 import models
@@ -8,6 +8,7 @@ from database import SessionLocal, engine
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from datetime import datetime, timedelta
 from jose import jwt
+from jose import JWTError
 
 SECRET_KEY = "l0mRWur8ICG7Y8pRezA650Vgfih1BlfY"
 ALGORITHM = "HS256"
@@ -60,6 +61,17 @@ def create_access_token(username: str, user_id: int, expires_delta: Optional[tim
     
     return jwt.encode(encode,SECRET_KEY,algorithm=ALGORITHM)
 
+async def get_current_user(token: str = Depends(oauth2_bearer)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        user_id: int = payload.get("id")
+        if username is None or user_id is None:
+            raise get_user_exception()
+        return {"Username" : username, "id" : user_id}
+    except JWTError:
+        raise get_user_exception()
+    
 @app.post("/create/user")
 async def create_new_user(create_user: CreateUser,db: Session = Depends(get_db)):
     create_user_model = models.Users()
@@ -82,9 +94,26 @@ async def create_new_user(create_user: CreateUser,db: Session = Depends(get_db))
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),db: Session=Depends(get_db)):
     user = authenticate_user(form_data.username,form_data.password,db)
     if not user:
-        raise HTTPException(status_code=404,detail="User not found.")
+        raise token_exception()
     
     token_expires = timedelta(minutes=20)
     token = create_access_token(user.username,user.id,expires_delta=token_expires)
     
     return {"token":token}
+
+#Exceptions
+def get_user_exception():
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"}
+    )
+    return credentials_exception
+
+def token_exception():
+    exc_response = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Incorrect username or password",
+        headers={"WWW-Authenticate": "Bearer"}
+    )
+    return exc_response
