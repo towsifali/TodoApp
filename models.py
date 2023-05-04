@@ -12,9 +12,10 @@ class Users(Base):
     hashed_password = Column(String)
     is_active = Column(Boolean, default = True)
     phone_number = Column(String)
-    address_id = Column(Integer, ForeignKey("address_id"),nullable=True)
+    address_id = Column(Integer, ForeignKey("address.id"),nullable=True)
     
     todos = relationship("Todos",back_populates="owner")
+    address =relationship("Address",back_populates="user_address")
 
 class Todos(Base):
     __tablename__ = "todos"
@@ -27,7 +28,6 @@ class Todos(Base):
     owner_id = Column(Integer, ForeignKey("users.id"))
     
     owner = relationship("Users",back_populates="todos")
-    address =relationship("Address",back_populates="user_address")
     
 class Address(Base):
     __tablename__ = "address"
@@ -35,6 +35,7 @@ class Address(Base):
     id = Column(Integer,primary_key=True,index=True)
     address1 = Column(String)
     address2 = Column(String)
+    aptnum = Column(String)
     city = Column(String)
     state = Column(String)
     country = Column(String)
