@@ -60,6 +60,6 @@ async def user_password_change(request: Request, username: str = Form(...), pass
             user_data.hashed_password = get_password_hash(password2)
             db.add(user_data)
             db.commit()
-            msg = 'Password updated'
+            msg = 'Password Updated'
     
     return templates.TemplateResponse("edit-user-password.html",{"request": request, "user" : user, "msg":msg})
