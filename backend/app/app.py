@@ -4,6 +4,7 @@ from beanie import init_beanie
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from app.models.user_model import User
+from app.models.todo_model import Todo
 from app.api.router import router
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -25,12 +26,13 @@ async def app_init():
         initialize crucial application services
     """
 
-    db_client = AsyncIOMotorClient(settings.MONGO_CONNECTION_STRING).fodoist
+    db_client = AsyncIOMotorClient(settings.MONGO_CONNECTION_STRING).dotoday
 
     await init_beanie(
         database=db_client,
         document_models=[
-            User
+            User,
+            Todo
         ]
     )
 
