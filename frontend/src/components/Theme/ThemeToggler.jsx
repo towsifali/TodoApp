@@ -1,7 +1,7 @@
 import {Switch, useColorMode, FormLabel} from '@chakra-ui/react'
 
 
-const ThemeToggler = ({showLabel = false, ...rest}) => {
+export const ThemeToggler = ({showLabel = false, ...rest}) => {
 const {toggleColorMode, colorMode} = useColorMode();
   return (
     <>
@@ -12,7 +12,7 @@ const {toggleColorMode, colorMode} = useColorMode();
         <Switch
         id="theme-toggler"
         size="sm"
-        isChecked={colorMode=="dark"}
+        isChecked={colorMode==="dark"}
         isDisabled={false}
         value = {colorMode}
         colorScheme="green"
@@ -24,4 +24,4 @@ const {toggleColorMode, colorMode} = useColorMode();
   )
 }
 
-export default ThemeToggler
+export default ThemeToggler;
